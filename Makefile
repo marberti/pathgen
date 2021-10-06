@@ -2,12 +2,18 @@ FC = gfortran
 
 FLAGS = -cpp -Wall -Wpedantic
 
-SRC = $(wildcard *.f90)
+SRC = mod_error.f90 \
+      mod_input.f90 \
+      main.f90
+
 OBJ = $(SRC:%.f90=%.o)
 EXE = pathgen.x
 
 .PHONY: default
-default: $(EXE)
+default: clean $(EXE)
+
+.PHONY: quickbuild
+quickbuild: $(EXE)
 
 .PHONY: clean
 clean:
