@@ -1,3 +1,5 @@
+graph.dat
+graph.out
 *.o
 *.mod
 *.x
