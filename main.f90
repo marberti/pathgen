@@ -1,6 +1,7 @@
 program main
 
   use mod_input
+  use mod_output
 
   implicit none
 
