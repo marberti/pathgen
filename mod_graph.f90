@@ -36,6 +36,11 @@ subroutine set_start_vert(a)
 
   character(*), parameter :: my_name = "set_start_vert"
 
+  ! preliminary checks --------------------------------------------------------
+  if (flag_graph_conn.eqv..false.) then
+    call error(my_name//": graph connections not initialized")
+  end if
+
   if ((a < 1).or.(a > size(graph_conn,1))) then
     call error(my_name//": start vertex out of bounds")
   end if
@@ -51,6 +56,11 @@ subroutine set_end_vert(a)
   integer, intent(in) :: a
 
   character(*), parameter :: my_name = "set_end_vert"
+
+  ! preliminary checks --------------------------------------------------------
+  if (flag_graph_conn.eqv..false.) then
+    call error(my_name//": graph connections not initialized")
+  end if
 
   if ((a < 1).or.(a > size(graph_conn,1))) then
     call error(my_name//": end vertex out of bounds")
