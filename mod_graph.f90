@@ -25,6 +25,7 @@ module mod_graph
   integer :: start_vert = -1
   integer :: end_vert   = -1
   integer :: paths_found
+  integer :: dead_paths
   logical, dimension(:,:), allocatable :: graph_conn
   logical :: flag_graph_conn = .false.
 
@@ -121,12 +122,14 @@ subroutine find_graph_paths()
   ! call the private subroutine -----------------------------------------------
   write(fout_numb,*) "Paths:"
   paths_found = 0
+  dead_paths  = 0
   allocate(visited(size(graph_conn,1)),stat=err_n,errmsg=err_msg)
   if (err_n /= 0) call error(my_name//": "//trim(err_msg))
   visited = .false.
   call priv_find_graph_paths(start_vert,end_vert,visited,"")
   write(fout_numb,*)
   write(fout_numb,*) "Total paths found: ", paths_found
+  write(fout_numb,*) "Dead  paths found: ", dead_paths
 
 end subroutine find_graph_paths
 
@@ -146,6 +149,9 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
   logical, dimension(:), allocatable :: nw_visited
   character(8) :: i_str
   character(8) :: f_str
+  logical :: found_conn
+
+  found_conn = .false.
 
   allocate(nw_visited(size(visited)),stat=err_n,errmsg=err_msg)
   if (err_n /= 0) call error(my_name//": "//trim(err_msg))
@@ -156,6 +162,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
     if (visited(j)) cycle
 
     if (graph_conn(i,j)) then
+      found_conn = .true.
       write(i_str,'(I8)') i
       i_str = adjustl(i_str)
       if (j == f) then
@@ -168,6 +175,8 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
       end if
     end if
   end do
+
+  if (found_conn.eqv..false.) dead_paths = dead_paths + 1
 
 end subroutine priv_find_graph_paths
 
