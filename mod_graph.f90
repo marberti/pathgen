@@ -9,7 +9,8 @@ module mod_graph
   ! public procedures ---------------------------------------------------------
   public :: set_start_vert,   &
             set_end_vert,     &
-            init_graph_conn
+            init_graph_conn,  &
+            find_graph_paths
 
   ! protected variables -------------------------------------------------------
   public    :: start_vert,     &
@@ -28,6 +29,8 @@ module mod_graph
 
 contains
 
+!==============================================================================
+! Public
 !==============================================================================
 
 subroutine set_start_vert(a)
@@ -89,6 +92,47 @@ subroutine init_graph_conn(gph)
   flag_graph_conn = .true.
 
 end subroutine init_graph_conn
+
+!==============================================================================
+
+subroutine find_graph_paths()
+
+  character(*), parameter :: my_name = "find_graph_paths"
+  logical, dimension(:), allocatable :: visited
+
+  ! preliminary checks --------------------------------------------------------
+  if (flag_graph_conn.eqv..false.) then
+    call error(my_name//": graph connections not initialized")
+  end if
+
+  if (start_vert == -1) then
+    call error(my_name//": start vertex not initialized")
+  end if
+
+  if (end_vert == -1) then
+    call error(my_name//": end vertex not initialized")
+  end if
+
+  ! call the private subroutine -----------------------------------------------
+  allocate(visited(size(graph_conn,1)),stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  visited = .false.
+  call priv_find_graph_paths(start_vert,end_vert,visited,"")
+
+end subroutine find_graph_paths
+
+!==============================================================================
+! Private
+!==============================================================================
+
+recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
+
+  integer, intent(in) :: i
+  integer, intent(in) :: f
+  logical, dimension(:), intent(in) :: visited
+  character(*), intent(in) :: out_str
+
+end subroutine priv_find_graph_paths
 
 !==============================================================================
 

@@ -51,6 +51,9 @@ subroutine write_input_graph()
     write(fout_numb,frmt) graph_conn(i,:)
   end do
   write(fout_numb,*)
+  write(fout_numb,*) "Start vertex: ", start_vert
+  write(fout_numb,*) "End   vertex: ", end_vert
+  write(fout_numb,*)
 
 end subroutine write_input_graph
 
