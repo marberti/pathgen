@@ -24,6 +24,7 @@ module mod_graph
 
   integer :: start_vert = -1
   integer :: end_vert   = -1
+  integer :: paths_found
   logical, dimension(:,:), allocatable :: graph_conn
   logical :: flag_graph_conn = .false.
 
@@ -99,6 +100,7 @@ subroutine find_graph_paths()
 
   character(*), parameter :: my_name = "find_graph_paths"
   logical, dimension(:), allocatable :: visited
+  logical :: flag_opened
 
   ! preliminary checks --------------------------------------------------------
   if (flag_graph_conn.eqv..false.) then
@@ -113,11 +115,18 @@ subroutine find_graph_paths()
     call error(my_name//": end vertex not initialized")
   end if
 
+  inquire(unit=fout_numb,opened=flag_opened)
+  if (flag_opened.eqv..false.) call error(my_name//": output file not opened")
+
   ! call the private subroutine -----------------------------------------------
+  write(fout_numb,*) "Paths:"
+  paths_found = 0
   allocate(visited(size(graph_conn,1)),stat=err_n,errmsg=err_msg)
   if (err_n /= 0) call error(my_name//": "//trim(err_msg))
   visited = .false.
   call priv_find_graph_paths(start_vert,end_vert,visited,"")
+  write(fout_numb,*)
+  write(fout_numb,*) "Total paths found: ", paths_found
 
 end subroutine find_graph_paths
 
@@ -131,6 +140,34 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
   integer, intent(in) :: f
   logical, dimension(:), intent(in) :: visited
   character(*), intent(in) :: out_str
+
+  character(*), parameter :: my_name = "priv_find_graph_paths"
+  integer :: j
+  logical, dimension(:), allocatable :: nw_visited
+  character(8) :: i_str
+  character(8) :: f_str
+
+  allocate(nw_visited(size(visited)),stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  nw_visited = visited
+  nw_visited(i) = .true.
+
+  do j = 1, size(graph_conn,1)
+    if (visited(j)) cycle
+
+    if (graph_conn(i,j)) then
+      write(i_str,'(I8)') i
+      i_str = adjustl(i_str)
+      if (j == f) then
+        write(f_str,'(I8)') f
+        f_str = adjustl(f_str)
+        write(fout_numb,*) out_str//" "//trim(i_str)//" "//trim(f_str)
+        paths_found = paths_found + 1
+      else
+         call priv_find_graph_paths(j,f,nw_visited,out_str//" "//trim(i_str))
+      end if
+    end if
+  end do
 
 end subroutine priv_find_graph_paths
 
