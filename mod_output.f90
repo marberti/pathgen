@@ -1,5 +1,6 @@
 module mod_output
 
+  use mod_error
   use mod_graph
 
   implicit none
@@ -16,7 +17,12 @@ contains
 
 subroutine open_output_file()
 
+  character(*), parameter :: my_name = "open_output_file"
 
+  character(*), parameter :: fname = "graph.out"
+
+  open(unit=fout_numb,file=fname,action="write",iostat=err_n,iomsg=err_msg)
+  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
 
 end subroutine open_output_file
 
