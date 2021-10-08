@@ -1,6 +1,6 @@
 FC = gfortran
 
-FLAGS = -cpp -Wall -Wpedantic
+FLAGS = -cpp -O2 -Wall -Wpedantic
 
 SRC = mod_error.f90  \
       mod_graph.f90  \
