@@ -159,7 +159,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
   nw_visited(i) = .true.
 
   do j = 1, size(graph_conn,1)
-    if (visited(j)) cycle
+    if (nw_visited(j)) cycle
 
     if (graph_conn(i,j)) then
       found_conn = .true.
