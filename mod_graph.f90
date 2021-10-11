@@ -14,16 +14,20 @@ module mod_graph
             find_graph_paths
 
   ! protected variables -------------------------------------------------------
-  public    :: graph_paths,    &
-               start_vert,     &
-               end_vert,       &
-               graph_conn,     &
-               flag_graph_conn
-  protected :: graph_paths,    &
-               start_vert,     &
-               end_vert,       &
-               graph_conn,     &
-               flag_graph_conn
+  public    :: graph_paths,     &
+               start_vert,      &
+               end_vert,        &
+               graph_conn,      &
+               flag_graph_conn, &
+               paths_found,     &
+               dead_paths
+  protected :: graph_paths,     &
+               start_vert,      &
+               end_vert,        &
+               graph_conn,      &
+               flag_graph_conn, &
+               paths_found,     &
+               dead_paths
 
   type :: graph_paths_t
     integer, dimension(:), allocatable :: node
@@ -110,7 +114,6 @@ subroutine find_graph_paths()
 
   character(*), parameter :: my_name = "find_graph_paths"
   logical, dimension(:), allocatable :: visited
-  logical :: flag_opened
 
   ! preliminary checks --------------------------------------------------------
   if (flag_graph_conn.eqv..false.) then
@@ -125,20 +128,13 @@ subroutine find_graph_paths()
     call error(my_name//": end vertex not initialized")
   end if
 
-  inquire(unit=fout_numb,opened=flag_opened)
-  if (flag_opened.eqv..false.) call error(my_name//": output file not opened")
-
   ! call the private subroutine -----------------------------------------------
-  write(fout_numb,*) "Paths:"
   paths_found = 0
   dead_paths  = 0
   allocate(visited(size(graph_conn,1)),stat=err_n,errmsg=err_msg)
   if (err_n /= 0) call error(my_name//": "//trim(err_msg))
   visited = .false.
   call priv_find_graph_paths(start_vert,end_vert,visited,"")
-  write(fout_numb,*)
-  write(fout_numb,*) "Total paths found: ", paths_found
-  write(fout_numb,*) "Dead  paths found: ", dead_paths
 
 end subroutine find_graph_paths
 
@@ -177,7 +173,6 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
       if (j == f) then
         write(f_str,'(I8)') f
         f_str = adjustl(f_str)
-        write(fout_numb,*) out_str//" "//trim(i_str)//" "//trim(f_str)
         call add_path(out_str//" "//trim(i_str)//" "//trim(f_str))
         paths_found = paths_found + 1
       else
