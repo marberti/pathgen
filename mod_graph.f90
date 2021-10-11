@@ -1,6 +1,7 @@
 module mod_graph
 
   use mod_error
+  use mod_utility
 
   implicit none
   save
@@ -13,15 +14,23 @@ module mod_graph
             find_graph_paths
 
   ! protected variables -------------------------------------------------------
-  public    :: start_vert,     &
+  public    :: graph_paths,    &
+               start_vert,     &
                end_vert,       &
                graph_conn,     &
                flag_graph_conn
-  protected :: start_vert,     &
+  protected :: graph_paths,    &
+               start_vert,     &
                end_vert,       &
                graph_conn,     &
                flag_graph_conn
 
+  type :: graph_paths_t
+    integer, dimension(:), allocatable :: node
+    integer :: sz
+  end type graph_paths_t
+
+  type(graph_paths_t), dimension(:), allocatable :: graph_paths
   integer :: start_vert = -1
   integer :: end_vert   = -1
   integer :: paths_found
@@ -169,6 +178,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
         write(f_str,'(I8)') f
         f_str = adjustl(f_str)
         write(fout_numb,*) out_str//" "//trim(i_str)//" "//trim(f_str)
+        call add_path(out_str//" "//trim(i_str)//" "//trim(f_str))
         paths_found = paths_found + 1
       else
          call priv_find_graph_paths(j,f,nw_visited,out_str//" "//trim(i_str))
@@ -179,6 +189,54 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
   if (found_conn.eqv..false.) dead_paths = dead_paths + 1
 
 end subroutine priv_find_graph_paths
+
+!==============================================================================
+
+subroutine add_path(pathstr)
+
+  character(*), intent(in) :: pathstr
+
+  character(*), parameter :: my_name = "add_path"
+  type(graph_paths_t), dimension(:), allocatable :: tmp
+  character(8) :: node
+  integer :: i
+  integer :: new_size
+  integer :: tot_nodes
+
+  ! count total number of nodes in the path -----------------------------------
+  tot_nodes = 0
+  do
+    call get_field(pathstr,node,tot_nodes+1,err_n,err_msg)
+    if (err_n /= 0) exit
+    tot_nodes = tot_nodes + 1
+  end do
+
+  ! allocate new graph_path ---------------------------------------------------
+  if (allocated(graph_paths)) then
+    new_size = size(graph_paths) + 1
+    call move_alloc(graph_paths,tmp)
+    allocate(graph_paths(new_size),stat=err_n,errmsg=err_msg)
+    if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+    graph_paths(:new_size-1) = tmp
+    deallocate(tmp,stat=err_n,errmsg=err_msg)
+    if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  else
+    new_size = 1
+    allocate(graph_paths(new_size),stat=err_n,errmsg=err_msg)
+    if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  end if
+
+  graph_paths(new_size)%sz = tot_nodes
+  allocate(graph_paths(new_size)%node(tot_nodes),stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+
+  ! store the path ------------------------------------------------------------
+  do i = 1, tot_nodes
+    call get_field(pathstr,node,i,err_n,err_msg)
+    read(node,*) graph_paths(new_size)%node(i)
+  end do
+
+end subroutine add_path
 
 !==============================================================================
 
