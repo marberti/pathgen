@@ -2,10 +2,11 @@ FC = gfortran
 
 FLAGS = -cpp -O2 -Wall -Wpedantic
 
-SRC = mod_error.f90  \
-      mod_graph.f90  \
-      mod_input.f90  \
-      mod_output.f90 \
+SRC = mod_error.f90   \
+      mod_utility.f90 \
+      mod_graph.f90   \
+      mod_input.f90   \
+      mod_output.f90  \
       main.f90
 
 OBJ = $(SRC:%.f90=%.o)
