@@ -7,13 +7,13 @@ module mod_graph
   save
   private
 
-  ! public procedures ---------------------------------------------------------
+  ! public procedures
   public :: set_start_vert,   &
             set_end_vert,     &
             init_graph_conn,  &
             find_graph_paths
 
-  ! protected variables -------------------------------------------------------
+  ! protected variables
   public    :: graph_paths,     &
                start_vert,      &
                end_vert,        &
@@ -44,16 +44,14 @@ module mod_graph
 
 contains
 
-!==============================================================================
-! Public
-!==============================================================================
+!!! Public !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine set_start_vert(a)
 
   integer, intent(in) :: a
   character(*), parameter :: my_name = "set_start_vert"
 
-  ! preliminary checks --------------------------------------------------------
+  ! preliminary checks
   if (flag_graph_conn.eqv..false.) then
     call error(my_name,"graph connections not initialized")
   end if
@@ -66,14 +64,14 @@ subroutine set_start_vert(a)
 
 end subroutine set_start_vert
 
-!==============================================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine set_end_vert(a)
 
   integer, intent(in) :: a
   character(*), parameter :: my_name = "set_end_vert"
 
-  ! preliminary checks --------------------------------------------------------
+  ! preliminary checks
   if (flag_graph_conn.eqv..false.) then
     call error(my_name,"graph connections not initialized")
   end if
@@ -86,7 +84,7 @@ subroutine set_end_vert(a)
 
 end subroutine set_end_vert
 
-!==============================================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine init_graph_conn(gph)
 
@@ -107,7 +105,7 @@ subroutine init_graph_conn(gph)
 
 end subroutine init_graph_conn
 
-!==============================================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine find_graph_paths()
 
@@ -116,7 +114,7 @@ subroutine find_graph_paths()
   integer :: err_n
   character(120) :: err_msg
 
-  ! preliminary checks --------------------------------------------------------
+  ! preliminary checks
   if (flag_graph_conn.eqv..false.) then
     call error(my_name,"graph connections not initialized")
   end if
@@ -129,7 +127,7 @@ subroutine find_graph_paths()
     call error(my_name,"end vertex not initialized")
   end if
 
-  ! call the private subroutine -----------------------------------------------
+  ! call the private subroutine
   paths_found = 0
   dead_paths  = 0
   allocate(visited(size(graph_conn,1)),stat=err_n,errmsg=err_msg)
@@ -139,9 +137,7 @@ subroutine find_graph_paths()
 
 end subroutine find_graph_paths
 
-!==============================================================================
-! Private
-!==============================================================================
+!!! Private !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
 
@@ -187,7 +183,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
 
 end subroutine priv_find_graph_paths
 
-!==============================================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine add_path(pathstr)
 
@@ -201,7 +197,7 @@ subroutine add_path(pathstr)
   integer :: err_n
   character(120) :: err_msg
 
-  ! count total number of nodes in the path -----------------------------------
+  ! count total number of nodes in the path
   tot_nodes = 0
   do
     call get_field(pathstr,node,tot_nodes+1,err_n,err_msg)
@@ -209,7 +205,7 @@ subroutine add_path(pathstr)
     tot_nodes = tot_nodes + 1
   end do
 
-  ! allocate new graph_path ---------------------------------------------------
+  ! allocate new graph_path
   if (allocated(graph_paths)) then
     new_size = size(graph_paths) + 1
     call move_alloc(graph_paths,tmp)
@@ -228,7 +224,7 @@ subroutine add_path(pathstr)
   allocate(graph_paths(new_size)%node(tot_nodes),stat=err_n,errmsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
 
-  ! store the path ------------------------------------------------------------
+  ! store the path
   do i = 1, tot_nodes
     call get_field(pathstr,node,i,err_n,err_msg)
     read(node,*) graph_paths(new_size)%node(i)
@@ -236,6 +232,6 @@ subroutine add_path(pathstr)
 
 end subroutine add_path
 
-!==============================================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 end module mod_graph

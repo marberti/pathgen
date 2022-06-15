@@ -8,17 +8,13 @@ module mod_get_field
 
 contains
 
-!====================================================================
-! Public
-!====================================================================
+!!! Public !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine get_field(str_in,str_out,n,err_n,err_msg)
 
-  !--------------------------------------------------------
   ! Takes an input string str_in in which
   ! every field is separated one another by one or more spaces.
   ! Gets the n field and store it in str_out.
-  !--------------------------------------------------------
 
   character(*), intent(IN)  :: str_in
   character(*), intent(OUT) :: str_out
@@ -97,6 +93,6 @@ subroutine get_field(str_in,str_out,n,err_n,err_msg)
 
 end subroutine get_field
 
-!====================================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 end module mod_get_field

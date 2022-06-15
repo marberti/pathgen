@@ -7,18 +7,18 @@ module mod_output
   save
   private
 
-  ! public procedures ---------------------------------------------------------
+  ! public procedures
   public :: open_output_file,  &
             close_output_file, &
             write_input_graph, &
             write_graph_paths
 
-  ! private variables ---------------------------------------------------------
+  ! private variables
   integer, parameter :: fout_numb = 700
 
 contains
 
-!==============================================================================
+!!! Public !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine open_output_file()
 
@@ -32,7 +32,7 @@ subroutine open_output_file()
 
 end subroutine open_output_file
 
-!==============================================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine close_output_file()
 
@@ -45,7 +45,7 @@ subroutine close_output_file()
 
 end subroutine close_output_file
 
-!==============================================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine write_input_graph()
 
@@ -76,7 +76,7 @@ subroutine write_input_graph()
 
 end subroutine write_input_graph
 
-!==============================================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine write_graph_paths()
 
@@ -101,6 +101,6 @@ subroutine write_graph_paths()
 
 end subroutine write_graph_paths
 
-!==============================================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 end module mod_output

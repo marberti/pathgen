@@ -11,7 +11,7 @@ module mod_input
 
 contains
 
-!==============================================================================
+!!! Public !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine read_input()
 
@@ -40,12 +40,12 @@ subroutine read_input()
   integer :: err_n
   character(120) :: err_msg
 
-  ! open input file -----------------------------------------------------------
+  ! open input file
   open(unit=fnumb,file=fname,status="old",action="read",&
     iostat=err_n,iomsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
 
-  ! read input file -----------------------------------------------------------
+  ! read input file
   read(fnumb,*,iostat=err_n,iomsg=err_msg) vert_n
   if (err_n /= 0) call error(my_name,err_msg)
   if (vert_n < 2) call error(my_name,"at least 2 vertices required")
@@ -84,7 +84,7 @@ subroutine read_input()
   read(fnumb,*,iostat=err_n,iomsg=err_msg) ch
   if (err_n == 0) call error(my_name,"too many lines in the input file")
 
-  ! close input file ----------------------------------------------------------
+  ! close input file
   close(unit=fnumb,iostat=err_n,iomsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
 
@@ -93,6 +93,6 @@ subroutine read_input()
 
 end subroutine read_input
 
-!==============================================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 end module mod_input
