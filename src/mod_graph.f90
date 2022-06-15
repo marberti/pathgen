@@ -1,7 +1,7 @@
 module mod_graph
 
   use mod_error
-  use mod_utility
+  use mod_get_field
 
   implicit none
   save

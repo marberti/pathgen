@@ -1,12 +1,12 @@
 FC = gfortran
-FLAGS = -cpp -O2 -Wall -Wpedantic
+FLAGS = -g -cpp -O2 -Wall -Wunused -Wpedantic -Wno-maybe-uninitialized -std=f2008
 
 SRCDIR = src
 OBJDIR = obj
 MODDIR = mod
 
 SOURCES = mod_error.f90                   \
-          mod_utility.f90                 \
+          mod_get_field.f90               \
           mod_graph.f90                   \
           mod_input.f90                   \
           mod_output.f90                  \

@@ -1,4 +1,4 @@
-module mod_utility
+module mod_get_field
 
   implicit none
   save
@@ -100,4 +100,4 @@ end subroutine get_field
 
 !====================================================================
 
-end module mod_utility
+end module mod_get_field
