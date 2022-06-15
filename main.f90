@@ -11,5 +11,6 @@ program main
   call write_input_graph()
   call find_graph_paths()
   call write_graph_paths()
+  call close_output_file()
 
 end program main

@@ -9,6 +9,7 @@ module mod_output
 
   ! public procedures ---------------------------------------------------------
   public :: open_output_file,  &
+            close_output_file, &
             write_input_graph, &
             write_graph_paths
 
@@ -19,13 +20,23 @@ contains
 subroutine open_output_file()
 
   character(*), parameter :: my_name = "open_output_file"
-
   character(*), parameter :: fname = "graph.out"
 
   open(unit=fout_numb,file=fname,action="write",iostat=err_n,iomsg=err_msg)
   if (err_n /= 0) call error(my_name//": "//trim(err_msg))
 
 end subroutine open_output_file
+
+!==============================================================================
+
+subroutine close_output_file()
+
+  character(*), parameter :: my_name = "close_output_file"
+
+  close(unit=fout_numb,iostat=err_n,iomsg=err_msg)
+  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+
+end subroutine close_output_file
 
 !==============================================================================
 
