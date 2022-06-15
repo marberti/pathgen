@@ -56,11 +56,11 @@ subroutine set_start_vert(a)
 
   ! preliminary checks --------------------------------------------------------
   if (flag_graph_conn.eqv..false.) then
-    call error(my_name//": graph connections not initialized")
+    call error(my_name,"graph connections not initialized")
   end if
 
   if ((a < 1).or.(a > size(graph_conn,1))) then
-    call error(my_name//": start vertex out of bounds")
+    call error(my_name,"start vertex out of bounds")
   end if
 
   start_vert = a
@@ -77,11 +77,11 @@ subroutine set_end_vert(a)
 
   ! preliminary checks --------------------------------------------------------
   if (flag_graph_conn.eqv..false.) then
-    call error(my_name//": graph connections not initialized")
+    call error(my_name,"graph connections not initialized")
   end if
 
   if ((a < 1).or.(a > size(graph_conn,1))) then
-    call error(my_name//": end vertex out of bounds")
+    call error(my_name,"end vertex out of bounds")
   end if
 
   end_vert = a
@@ -97,11 +97,11 @@ subroutine init_graph_conn(gph)
   character(*), parameter :: my_name = "init_graph_conn"
 
   if (size(gph,1) /= size(gph,2)) then
-    call error(my_name//": expected square matrix as argument")
+    call error(my_name,"expected square matrix as argument")
   end if
 
   allocate(graph_conn(size(gph,1),size(gph,1)),stat=err_n,errmsg=err_msg)
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  if (err_n /= 0) call error(my_name,err_msg)
 
   graph_conn = gph
   flag_graph_conn = .true.
@@ -117,22 +117,22 @@ subroutine find_graph_paths()
 
   ! preliminary checks --------------------------------------------------------
   if (flag_graph_conn.eqv..false.) then
-    call error(my_name//": graph connections not initialized")
+    call error(my_name,"graph connections not initialized")
   end if
 
   if (start_vert == -1) then
-    call error(my_name//": start vertex not initialized")
+    call error(my_name,"start vertex not initialized")
   end if
 
   if (end_vert == -1) then
-    call error(my_name//": end vertex not initialized")
+    call error(my_name,"end vertex not initialized")
   end if
 
   ! call the private subroutine -----------------------------------------------
   paths_found = 0
   dead_paths  = 0
   allocate(visited(size(graph_conn,1)),stat=err_n,errmsg=err_msg)
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  if (err_n /= 0) call error(my_name,err_msg)
   visited = .false.
   call priv_find_graph_paths(start_vert,end_vert,visited,"")
 
@@ -159,7 +159,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
   found_conn = .false.
 
   allocate(nw_visited(size(visited)),stat=err_n,errmsg=err_msg)
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  if (err_n /= 0) call error(my_name,err_msg)
   nw_visited = visited
   nw_visited(i) = .true.
 
@@ -211,19 +211,19 @@ subroutine add_path(pathstr)
     new_size = size(graph_paths) + 1
     call move_alloc(graph_paths,tmp)
     allocate(graph_paths(new_size),stat=err_n,errmsg=err_msg)
-    if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+    if (err_n /= 0) call error(my_name,err_msg)
     graph_paths(:new_size-1) = tmp
     deallocate(tmp,stat=err_n,errmsg=err_msg)
-    if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+    if (err_n /= 0) call error(my_name,err_msg)
   else
     new_size = 1
     allocate(graph_paths(new_size),stat=err_n,errmsg=err_msg)
-    if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+    if (err_n /= 0) call error(my_name,err_msg)
   end if
 
   graph_paths(new_size)%sz = tot_nodes
   allocate(graph_paths(new_size)%node(tot_nodes),stat=err_n,errmsg=err_msg)
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  if (err_n /= 0) call error(my_name,err_msg)
 
   ! store the path ------------------------------------------------------------
   do i = 1, tot_nodes

@@ -12,19 +12,23 @@ contains
 
 !==============================================================================
 
-subroutine error(msg)
+subroutine error(proc_name,proc_msg,fnumb)
 
-  use iso_fortran_env
+  use, intrinsic :: iso_fortran_env
 
-  character(*), intent(in) :: msg
-
+  character(*), intent(in) :: proc_name
+  character(*), intent(in) :: proc_msg
+  integer, optional, intent(in) :: fnumb
   logical :: flag_opened
 
-  inquire(unit=fout_numb,opened=flag_opened)
-  if (flag_opened) then
-    write(fout_numb,*) "ERR "//msg
+  if (present(fnumb)) then
+    inquire(unit=fnumb,opened=flag_opened)
+    if (flag_opened) then
+      write(fnumb,'(" ERR ",A,": ",A)') trim(proc_name), trim(proc_msg)
+    end if
   end if
-  write(ERROR_UNIT,*)  "ERR "//msg
+
+  write(ERROR_UNIT,'(" ERR ",A,": ",A)') trim(proc_name), trim(proc_msg)
   stop 1
 
 end subroutine error

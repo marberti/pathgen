@@ -23,7 +23,7 @@ subroutine open_output_file()
   character(*), parameter :: fname = "graph.out"
 
   open(unit=fout_numb,file=fname,action="write",iostat=err_n,iomsg=err_msg)
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  if (err_n /= 0) call error(my_name,err_msg)
 
 end subroutine open_output_file
 
@@ -34,7 +34,7 @@ subroutine close_output_file()
   character(*), parameter :: my_name = "close_output_file"
 
   close(unit=fout_numb,iostat=err_n,iomsg=err_msg)
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  if (err_n /= 0) call error(my_name,err_msg)
 
 end subroutine close_output_file
 
@@ -50,7 +50,7 @@ subroutine write_input_graph()
   character(120) :: frmt
 
   inquire(unit=fout_numb,opened=flag_opened)
-  if (flag_opened.eqv..false.) call error(my_name//": output file not opened")
+  if (flag_opened.eqv..false.) call error(my_name,"output file not opened")
 
   sz = size(graph_conn,1)
   write(i_str,'(I8)') sz
@@ -79,7 +79,7 @@ subroutine write_graph_paths()
   integer :: j
 
   inquire(unit=fout_numb,opened=flag_opened)
-  if (flag_opened.eqv..false.) call error(my_name//": output file not opened")
+  if (flag_opened.eqv..false.) call error(my_name,"output file not opened")
 
   write(fout_numb,*) "Paths:"
   do i = 1, size(graph_paths)

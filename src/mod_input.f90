@@ -42,26 +42,26 @@ subroutine read_input()
   ! open input file -----------------------------------------------------------
   open(unit=fnumb,file=fname,status="old",action="read",&
     iostat=err_n,iomsg=err_msg)
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  if (err_n /= 0) call error(my_name,err_msg)
 
   ! read input file -----------------------------------------------------------
   read(fnumb,*,iostat=err_n,iomsg=err_msg) vert_n
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
-  if (vert_n < 2)  call error(my_name//": at least 2 vertices required")
+  if (err_n /= 0) call error(my_name,err_msg)
+  if (vert_n < 2) call error(my_name,"at least 2 vertices required")
 
   read(fnumb,*,iostat=err_n,iomsg=err_msg) edge_n
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
-  if (edge_n < 0)  call error(my_name//": positive number of edges required")
+  if (err_n /= 0) call error(my_name,err_msg)
+  if (edge_n < 0) call error(my_name,"positive number of edges required")
 
   allocate(graph_conn(vert_n,vert_n),stat=err_n,errmsg=err_msg)
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  if (err_n /= 0) call error(my_name,err_msg)
   graph_conn = .false.
 
   do i = 1, edge_n
     read(fnumb,*,iostat=err_n,iomsg=err_msg) a, b
-    if (err_n /= 0) call error(my_name//": "//trim(err_msg))
-    if ((a < 1).or.(a > vert_n)) call error(my_name//": vertex out of bounds")
-    if ((b < 1).or.(b > vert_n)) call error(my_name//": vertex out of bounds")
+    if (err_n /= 0) call error(my_name,err_msg)
+    if ((a < 1).or.(a > vert_n)) call error(my_name,"vertex out of bounds")
+    if ((b < 1).or.(b > vert_n)) call error(my_name,"vertex out of bounds")
     graph_conn(a,b) = .true.
     graph_conn(b,a) = .true.
   end do
@@ -69,26 +69,26 @@ subroutine read_input()
   call init_graph_conn(graph_conn)
 
   read(fnumb,*,iostat=err_n,iomsg=err_msg) start_vert, end_vert
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  if (err_n /= 0) call error(my_name,err_msg)
   if ((start_vert < 1).or.(start_vert > vert_n)) then
-    call error(my_name//": start vertex out of bounds")
+    call error(my_name,"start vertex out of bounds")
   end if
   if ((end_vert < 1).or.(end_vert > vert_n)) then
-    call error(my_name//": end vertex out of bounds")
+    call error(my_name,"end vertex out of bounds")
   end if
 
   call set_start_vert(start_vert)
   call set_end_vert(end_vert)
 
   read(fnumb,*,iostat=err_n,iomsg=err_msg) ch
-  if (err_n == 0) call error(my_name//": too many lines in the input file")
+  if (err_n == 0) call error(my_name,"too many lines in the input file")
 
   ! close input file ----------------------------------------------------------
   close(unit=fnumb,iostat=err_n,iomsg=err_msg)
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  if (err_n /= 0) call error(my_name,err_msg)
 
   deallocate(graph_conn,stat=err_n,errmsg=err_msg)
-  if (err_n /= 0) call error(my_name//": "//trim(err_msg))
+  if (err_n /= 0) call error(my_name,err_msg)
 
 end subroutine read_input
 
