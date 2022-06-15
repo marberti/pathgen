@@ -2,9 +2,9 @@ module mod_error
 
   implicit none
   save
-  public
+  private
 
-  integer, parameter :: fout_numb = 700
+  public :: error
 
 contains
 

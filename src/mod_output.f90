@@ -13,6 +13,9 @@ module mod_output
             write_input_graph, &
             write_graph_paths
 
+  ! private variables ---------------------------------------------------------
+  integer, parameter :: fout_numb = 700
+
 contains
 
 !==============================================================================
