@@ -8,56 +8,30 @@ module mod_output
   private
 
   ! public procedures
-  public :: open_output_file,  &
-            close_output_file, &
-            write_input_graph, &
+  public :: write_input_graph,      &
             write_graph_paths
 
   ! private variables
   integer, parameter :: fout_numb = 700
+  character(*), parameter :: fout_name = "graph.out"
 
 contains
 
 !!! Public !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine open_output_file()
-
-  character(*), parameter :: my_name = "open_output_file"
-  character(*), parameter :: fname = "graph.out"
-  integer :: err_n
-  character(120) :: err_msg
-
-  open(unit=fout_numb,file=fname,action="write",iostat=err_n,iomsg=err_msg)
-  if (err_n /= 0) call error(my_name,err_msg)
-
-end subroutine open_output_file
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-subroutine close_output_file()
-
-  character(*), parameter :: my_name = "close_output_file"
-  integer :: err_n
-  character(120) :: err_msg
-
-  close(unit=fout_numb,iostat=err_n,iomsg=err_msg)
-  if (err_n /= 0) call error(my_name,err_msg)
-
-end subroutine close_output_file
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 subroutine write_input_graph()
 
   character(*), parameter :: my_name = "write_input_graph"
-  logical :: flag_opened
   integer :: i
   integer :: sz
   character(8) :: i_str
   character(120) :: frmt
+  integer :: err_n
+  character(120) :: err_msg
 
-  inquire(unit=fout_numb,opened=flag_opened)
-  if (flag_opened.eqv..false.) call error(my_name,"output file not opened")
+  open(unit=fout_numb,file=fout_name,status="replace",action="write", &
+    iostat=err_n,iomsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
 
   sz = size(graph_conn,1)
   write(i_str,'(I8)') sz
@@ -73,31 +47,43 @@ subroutine write_input_graph()
   write(fout_numb,*) "Start vertex: ", start_vert
   write(fout_numb,*) "End   vertex: ", end_vert
   write(fout_numb,*)
+  write(fout_numb,*) "Paths:"
+
+  close(unit=fout_numb,iostat=err_n,iomsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
 
 end subroutine write_input_graph
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine write_graph_paths()
+subroutine write_graph_paths(flag_total_paths)
 
+  logical, intent(in) :: flag_total_paths
   character(*), parameter :: my_name = "write_graph_paths"
-  logical :: flag_opened
   integer :: i
   integer :: j
+  integer :: err_n
+  character(120) :: err_msg
 
-  inquire(unit=fout_numb,opened=flag_opened)
-  if (flag_opened.eqv..false.) call error(my_name,"output file not opened")
+  open(unit=fout_numb,file=fout_name,status="unknown",action="write", &
+    position="append",iostat=err_n,iomsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
 
-  write(fout_numb,*) "Paths:"
   do i = 1, size(graph_paths)
     do j = 1, graph_paths(i)%sz
       write(fout_numb,'(1X,I4)',advance="no") graph_paths(i)%node(j)
     end do
     write(fout_numb,*)
   end do
-  write(fout_numb,*)
-  write(fout_numb,*) "Total paths found: ", paths_found
-  write(fout_numb,*) "Dead  paths found: ", dead_paths
+
+  if (flag_total_paths) then
+    write(fout_numb,*)
+    write(fout_numb,*) "Total paths found: ", paths_found
+    write(fout_numb,*) "Dead  paths found: ", dead_paths
+  end if
+
+  close(unit=fout_numb,iostat=err_n,iomsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
 
 end subroutine write_graph_paths
 
