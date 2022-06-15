@@ -5,8 +5,6 @@ module mod_error
   public
 
   integer, parameter :: fout_numb = 700
-  integer        :: err_n
-  character(120) :: err_msg
 
 contains
 

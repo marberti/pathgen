@@ -28,7 +28,6 @@ subroutine read_input()
   character(*), parameter :: my_name = "read_input"
   character(*), parameter :: fname   = "graph.dat"
   integer, parameter      :: fnumb   = 600
-
   character :: ch
   integer :: vert_n
   integer :: edge_n
@@ -38,6 +37,8 @@ subroutine read_input()
   integer :: start_vert
   integer :: end_vert
   logical, dimension(:,:), allocatable :: graph_conn
+  integer :: err_n
+  character(120) :: err_msg
 
   ! open input file -----------------------------------------------------------
   open(unit=fnumb,file=fname,status="old",action="read",&

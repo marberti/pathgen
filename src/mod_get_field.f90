@@ -25,7 +25,6 @@ subroutine get_field(str_in,str_out,n,err_n,err_msg)
   integer,      intent(IN)  :: n
   integer,      intent(OUT) :: err_n         ! 0 on success, 1 otherwise
   character(*), intent(OUT) :: err_msg       ! message set in case of failure
-
   integer, parameter        :: SUCCESS       = 0
   integer, parameter        :: FAILURE       = 1
   integer                   :: i

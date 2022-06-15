@@ -21,6 +21,8 @@ subroutine open_output_file()
 
   character(*), parameter :: my_name = "open_output_file"
   character(*), parameter :: fname = "graph.out"
+  integer :: err_n
+  character(120) :: err_msg
 
   open(unit=fout_numb,file=fname,action="write",iostat=err_n,iomsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
@@ -32,6 +34,8 @@ end subroutine open_output_file
 subroutine close_output_file()
 
   character(*), parameter :: my_name = "close_output_file"
+  integer :: err_n
+  character(120) :: err_msg
 
   close(unit=fout_numb,iostat=err_n,iomsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)

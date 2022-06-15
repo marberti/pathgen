@@ -51,7 +51,6 @@ contains
 subroutine set_start_vert(a)
 
   integer, intent(in) :: a
-
   character(*), parameter :: my_name = "set_start_vert"
 
   ! preliminary checks --------------------------------------------------------
@@ -72,7 +71,6 @@ end subroutine set_start_vert
 subroutine set_end_vert(a)
 
   integer, intent(in) :: a
-
   character(*), parameter :: my_name = "set_end_vert"
 
   ! preliminary checks --------------------------------------------------------
@@ -93,8 +91,9 @@ end subroutine set_end_vert
 subroutine init_graph_conn(gph)
 
   logical, dimension(:,:), intent(in) :: gph
-
   character(*), parameter :: my_name = "init_graph_conn"
+  integer :: err_n
+  character(120) :: err_msg
 
   if (size(gph,1) /= size(gph,2)) then
     call error(my_name,"expected square matrix as argument")
@@ -114,6 +113,8 @@ subroutine find_graph_paths()
 
   character(*), parameter :: my_name = "find_graph_paths"
   logical, dimension(:), allocatable :: visited
+  integer :: err_n
+  character(120) :: err_msg
 
   ! preliminary checks --------------------------------------------------------
   if (flag_graph_conn.eqv..false.) then
@@ -148,13 +149,14 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
   integer, intent(in) :: f
   logical, dimension(:), intent(in) :: visited
   character(*), intent(in) :: out_str
-
   character(*), parameter :: my_name = "priv_find_graph_paths"
   integer :: j
   logical, dimension(:), allocatable :: nw_visited
   character(8) :: i_str
   character(8) :: f_str
   logical :: found_conn
+  integer :: err_n
+  character(120) :: err_msg
 
   found_conn = .false.
 
@@ -190,13 +192,14 @@ end subroutine priv_find_graph_paths
 subroutine add_path(pathstr)
 
   character(*), intent(in) :: pathstr
-
   character(*), parameter :: my_name = "add_path"
   type(graph_paths_t), dimension(:), allocatable :: tmp
   character(8) :: node
   integer :: i
   integer :: new_size
   integer :: tot_nodes
+  integer :: err_n
+  character(120) :: err_msg
 
   ! count total number of nodes in the path -----------------------------------
   tot_nodes = 0
