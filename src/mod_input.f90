@@ -49,6 +49,8 @@ subroutine read_input(fname)
   character(200) :: buff
   character(20)  :: keyword
   character(100) :: arg
+  character(16), dimension(:), allocatable :: nodelist
+  character(16), dimension(:), allocatable :: grouplist
   character :: ch
   integer :: node_n
   integer :: vert_n
@@ -92,20 +94,20 @@ subroutine read_input(fname)
     if (buff(1:1) == "#") cycle
 
     call get_field(buff,keyword,1,err_n,err_msg)
-    if (err_n == 0) call error(my_name,err_msg)
+    if (err_n /= 0) call error(my_name,err_msg)
 
     select case (keyword)
     case ("graphtype")
       call get_field(buff,arg,2,err_n,err_msg)
-      if (err_n == 0) then
-        call error(my_name,"missing argument of "//trim(keywork))
+      if (err_n /= 0) then
+        call error(my_name,"missing argument of "//trim(keyword))
       end if
       call set_graphtype(arg)
       flag_graphtype = .true.
     case ("nodetype")
       call get_field(buff,arg,2,err_n,err_msg)
-      if (err_n == 0) then
-        call error(my_name,"missing argument of "//trim(keywork))
+      if (err_n /= 0) then
+        call error(my_name,"missing argument of "//trim(keyword))
       end if
       call set_nodetype(arg)
       flag_nodetype = .true.
@@ -115,10 +117,16 @@ subroutine read_input(fname)
           "keywords "//trim(keyword)//" and nodelist are mutually exclusive")
       end if
 
-      call get_field(buff,node_n,2,err_n,err_msg)
-      if (err_n == 0) then
-        call error(my_name,"missing argument of "//trim(keywork))
+      call get_field(buff,arg,2,err_n,err_msg)
+      if (err_n /= 0) then
+        call error(my_name,"missing argument of "//trim(keyword))
       end if
+
+      read(arg,*,iostat=err_n,iomsg=err_msg) node_n
+      if (err_n /= 0) then
+        call error(my_name,err_msg)
+      end if
+
       flag_nodenumber = .true.
     case ("nodelist")
       if (flag_nodenumber) then
@@ -134,7 +142,7 @@ subroutine read_input(fname)
           "nodenumber or nodelist must be specified before "//trim(keyword))
       end if
 
-      call get_edgelist(fnumb,edgelist)
+      call get_edgelist(fnumb)
       flag_edgelist = .true.
     case ("fromto")
       if (.not.(flag_nodenumber.or.flag_nodelist)) then
@@ -143,14 +151,14 @@ subroutine read_input(fname)
       end if
 
       call get_field(buff,arg,2,err_n,err_msg)
-      if (err_n == 0) then
-        call error(my_name,"missing first argument of "//trim(keywork))
+      if (err_n /= 0) then
+        call error(my_name,"missing first argument of "//trim(keyword))
       end if
       call set_start_vert(arg)
 
       call get_field(buff,arg,3,err_n,err_msg)
-      if (err_n == 0) then
-        call error(my_name,"missing second argument of "//trim(keywork))
+      if (err_n /= 0) then
+        call error(my_name,"missing second argument of "//trim(keyword))
       end if
       call set_end_vert(arg)
       flag_fromto = .true.
@@ -207,10 +215,9 @@ end subroutine get_nodelist
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine get_edgelist(fnumb,edgelist)
+subroutine get_edgelist(fnumb)
 
   integer, intent(in) :: fnumb
-  character(*), dimension(:), allocatable, intent(out) :: edgelist
 
 end subroutine get_edgelist
 
