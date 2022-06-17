@@ -10,20 +10,27 @@ module mod_graph
   ! public procedures
   public :: set_graphtype,    &
             set_nodetype,     &
+            set_nodes,        &
+            set_nodelist,     &
+            set_grouplist,    &
             set_start_vert,   &
             set_end_vert,     &
             init_graph_conn,  &
             find_graph_paths
 
   ! protected variables
-  public    :: graph_paths,     &
+  public    :: graphtype,       &
+               nodetype,        &
+               graph_paths,     &
                start_vert,      &
                end_vert,        &
                graph_conn,      &
                flag_graph_conn, &
                paths_found,     &
                dead_paths
-  protected :: graph_paths,     &
+  protected :: graphtype,       &
+               nodetype,        &
+               graph_paths,     &
                start_vert,      &
                end_vert,        &
                graph_conn,      &
@@ -79,6 +86,30 @@ subroutine set_nodetype(str)
   end select
 
 end subroutine set_nodetype
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine set_nodes(n)
+
+  integer :: n
+
+end subroutine set_nodes
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine set_nodelist(list)
+
+  character(*), dimension(:), intent(in) :: list
+
+end subroutine set_nodelist
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine set_grouplist(list)
+
+  character(*), dimension(:), intent(in) :: list
+
+end subroutine set_grouplist
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
