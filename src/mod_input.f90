@@ -119,7 +119,7 @@ subroutine read_input(fname)
         call error(my_name,err_msg)
       end if
 
-      call set_nodes(node_n)
+      call set_graph_nodes(node_n)
       flag_nodenumber = .true.
     case ("nodelist")
       if (.not.flag_nodetype) then
@@ -132,12 +132,12 @@ subroutine read_input(fname)
       end if
 
       call get_nodelist(fnumb,nodelist,grouplist)
-      call set_nodes(size(nodelist))
-      call set_nodelist(nodelist)
+      call set_graph_nodes(size(nodelist))
+      call set_graph_nodelist(nodelist)
       deallocate(nodelist,stat=err_n,errmsg=err_msg)
       if (err_n/= 0) call error(my_name,err_msg)
       if (allocated(grouplist)) then
-        call set_grouplist(grouplist)
+        call set_graph_grouplist(grouplist)
         deallocate(grouplist,stat=err_n,errmsg=err_msg)
         if (err_n/= 0) call error(my_name,err_msg)
       end if

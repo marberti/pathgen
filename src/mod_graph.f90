@@ -8,14 +8,14 @@ module mod_graph
   private
 
   ! public procedures
-  public :: set_graphtype,    &
-            set_nodetype,     &
-            set_nodes,        &
-            set_nodelist,     &
-            set_grouplist,    &
-            set_start_vert,   &
-            set_end_vert,     &
-            init_graph_conn,  &
+  public :: set_graphtype,          &
+            set_nodetype,           &
+            set_graph_nodes,        &
+            set_graph_nodelist,     &
+            set_graph_grouplist,    &
+            set_start_vert,         &
+            set_end_vert,           &
+            init_graph_conn,        &
             find_graph_paths
 
   ! protected variables
@@ -45,6 +45,9 @@ module mod_graph
 
   character(20) :: graphtype
   character(20) :: nodetype
+  integer :: graph_nodes
+  character(16), dimension(:), allocatable :: graph_nodelist
+  character(16), dimension(:), allocatable :: graph_grouplist
   type(graph_paths_t), dimension(:), allocatable :: graph_paths
   integer :: start_vert = -1
   integer :: end_vert   = -1
@@ -89,27 +92,54 @@ end subroutine set_nodetype
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine set_nodes(n)
+subroutine set_graph_nodes(n)
 
   integer :: n
+  character(*), parameter :: my_name = "set_graph_nodes"
 
-end subroutine set_nodes
+  if (n <= 0) call error(my_name,"number of nodes must be > 0")
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  graph_nodes = n
 
-subroutine set_nodelist(list)
-
-  character(*), dimension(:), intent(in) :: list
-
-end subroutine set_nodelist
+end subroutine set_graph_nodes
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine set_grouplist(list)
+subroutine set_graph_nodelist(list)
 
   character(*), dimension(:), intent(in) :: list
+  character(*), parameter :: my_name = "set_graph_nodelist"
+  integer :: n
+  integer :: err_n
+  character(120) :: err_msg
 
-end subroutine set_grouplist
+  n = size(list)
+
+  allocate(graph_nodelist(n),stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+
+  graph_nodelist = list
+
+end subroutine set_graph_nodelist
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine set_graph_grouplist(list)
+
+  character(*), dimension(:), intent(in) :: list
+  character(*), parameter :: my_name = "set_graph_grouplist"
+  integer :: n
+  integer :: err_n
+  character(120) :: err_msg
+
+  n = size(list)
+
+  allocate(graph_grouplist(n),stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+
+  graph_grouplist = list
+
+end subroutine set_graph_grouplist
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
