@@ -6,7 +6,9 @@ program main
 
   implicit none
 
-  call read_input()
+  character(*), parameter :: fname = "graph.dat"
+
+  call read_input(fname)
   call write_input_graph()
   call find_graph_paths()
   call write_graph_paths(.true.)
