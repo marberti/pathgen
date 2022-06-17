@@ -52,7 +52,6 @@ subroutine read_input(fname)
   character(16), dimension(:), allocatable :: nodelist
   character(16), dimension(:), allocatable :: grouplist
   integer :: node_n
-  logical, dimension(:,:), allocatable :: graph_conn
   logical :: flag_error
   logical :: flag_graphtype
   logical :: flag_nodetype
@@ -152,7 +151,7 @@ subroutine read_input(fname)
           "nodenumber or nodelist must be specified before "//trim(keyword))
       end if
 
-      call get_edgelist(fnumb,graph_conn)
+      call get_edgelist(fnumb)
       flag_edgelist = .true.
     case ("fromto")
       if (.not.(flag_nodenumber.or.flag_nodelist)) then
@@ -211,10 +210,6 @@ subroutine read_input(fname)
   ! exit on error
   if (flag_error) call error(my_name,"missing mandatory keyword(s)")
 
-  !@@@
-  stop 42
-  !@@@
-
 end subroutine read_input
 
 !!! Private !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -272,27 +267,95 @@ end subroutine get_nodelist
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine get_edgelist(fnumb,cm)
+subroutine get_edgelist(fnumb)
 
   integer, intent(in) :: fnumb
-  logical, dimension(:,:), allocatable, intent(out) :: cm
   character(*), parameter :: my_name = "get_edgelist"
+  logical, dimension(:,:), allocatable :: cm
   integer :: lines
   integer :: i
-  character(200) :: buff
+  integer :: j
+  integer :: i1
+  integer :: i2
+  integer :: cm_n
+  character(50) :: buff
+  character(16) :: n1
+  character(16) :: n2
+  logical :: flag_undirected
   integer :: err_n
   character(120) :: err_msg
 
+  if (graphtype == "undirected") then
+    flag_undirected = .true.
+  else
+    flag_undirected = .false.
+  end if
+
   lines = read_lines(fnumb,"endedgelist")
 
-  allocate(cm(lines,lines),stat=err_n,errmsg=err_msg)
+  ! allocation
+  if (allocated(graph_nodelist)) then
+    cm_n = size(graph_nodelist)
+  else
+    cm_n = graph_nodes
+  end if
+
+  allocate(cm(cm_n,cm_n),stat=err_n,errmsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
 
-  do i = 1, lines
-    read(fnumb,'(A200)') buff
-  end do
+  cm = .false.
+
+  ! read edges
+  if (allocated(graph_nodelist)) then
+    do i = 1, lines
+      read(fnumb,'(A50)',iostat=err_n,iomsg=err_msg) buff
+      if (err_n /= 0) call error(my_name,err_msg)
+
+      call get_field(buff,n1,1,err_n,err_msg)
+      if (err_n /= 0) call error(my_name,err_msg)
+      call get_field(buff,n2,2,err_n,err_msg)
+      if (err_n /= 0) call error(my_name,err_msg)
+
+      i1 = -1
+      i2 = -1
+      do j = 1, cm_n
+        if (graph_nodelist(j) == n1) i1 = j
+        if (graph_nodelist(j) == n2) i2 = j
+      end do
+
+      if (i1 < 0) then
+        call error(my_name,"unknow node name 1 in line: "//trim(buff))
+      else if (i2 < 0) then
+        call error(my_name,"unknow node name 2 in line: "//trim(buff))
+      end if
+
+      cm(i1,i2) = .true.
+      if (flag_undirected) cm(i2,i1) = .true.
+    end do
+  else
+    do i = 1, lines
+      read(fnumb,*,iostat=err_n,iomsg=err_msg) i1, i2
+      if (err_n /= 0) call error(my_name,err_msg)
+
+      if ((i1 < 0).or.(i1 > graph_nodes)) then
+        call error(my_name,"node 1 out of range in line:"//trim(buff))
+      else if ((i2 < 0).or.(i2 > graph_nodes)) then
+        call error(my_name,"node 2 out of range in line:"//trim(buff))
+      end if
+
+      cm(i1,i2) = .true.
+      if (flag_undirected) cm(i2,i1) = .true.
+    end do
+  end if
 
   read(fnumb,'(A200)') buff
+
+  ! set edges
+  call init_graph_conn(cm)
+
+  ! deallocation
+  deallocate(cm,stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
 
 end subroutine get_edgelist
 

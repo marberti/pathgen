@@ -21,6 +21,9 @@ module mod_graph
   ! protected variables
   public    :: graphtype,       &
                nodetype,        &
+               graph_nodes,     &
+               graph_nodelist,  &
+               graph_grouplist, &
                graph_paths,     &
                start_vert,      &
                end_vert,        &
@@ -30,6 +33,9 @@ module mod_graph
                dead_paths
   protected :: graphtype,       &
                nodetype,        &
+               graph_nodes,     &
+               graph_nodelist,  &
+               graph_grouplist, &
                graph_paths,     &
                start_vert,      &
                end_vert,        &
