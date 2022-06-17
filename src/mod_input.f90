@@ -49,8 +49,6 @@ subroutine read_input(fname)
   character(200) :: buff
   character(20)  :: keyword
   character(100) :: arg
-  character(16), dimension(:), allocatable :: nodelist
-  character(16), dimension(:), allocatable :: grouplist
   integer :: node_n
   logical :: flag_error
   logical :: flag_graphtype
@@ -130,16 +128,7 @@ subroutine read_input(fname)
           "keywords "//trim(keyword)//" and nodenumber are mutually exclusive")
       end if
 
-      call get_nodelist(fnumb,nodelist,grouplist)
-      call set_graph_nodes(size(nodelist))
-      call set_graph_nodelist(nodelist)
-      deallocate(nodelist,stat=err_n,errmsg=err_msg)
-      if (err_n/= 0) call error(my_name,err_msg)
-      if (allocated(grouplist)) then
-        call set_graph_grouplist(grouplist)
-        deallocate(grouplist,stat=err_n,errmsg=err_msg)
-        if (err_n/= 0) call error(my_name,err_msg)
-      end if
+      call get_nodelist(fnumb)
       flag_nodelist = .true.
     case ("edgelist")
       if (.not.flag_graphtype) then
@@ -214,16 +203,16 @@ end subroutine read_input
 
 !!! Private !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine get_nodelist(fnumb,nodelist,grouplist)
+subroutine get_nodelist(fnumb)
 
   integer, intent(in) :: fnumb
-  character(*), dimension(:), allocatable, intent(out) :: nodelist
-  character(*), dimension(:), allocatable, intent(out) :: grouplist
   character(*), parameter :: my_name = "get_nodelist"
+  character(16), dimension(:), allocatable :: nodelist
+  character(16), dimension(:), allocatable :: grouplist
   integer :: lines
   integer :: i
-  character(200) :: buff
-  character(100) :: arg
+  character(50) :: buff
+  character(16) :: arg
   logical :: flag_group
   integer :: err_n
   character(120) :: err_msg
@@ -243,7 +232,7 @@ subroutine get_nodelist(fnumb,nodelist,grouplist)
 
   ! read nodes and groups
   do i = 1, lines
-    read(fnumb,'(A200)',iostat=err_n,iomsg=err_msg) buff
+    read(fnumb,'(A50)',iostat=err_n,iomsg=err_msg) buff
     if (err_n /= 0) call error(my_name,err_msg)
 
     call get_field(buff,arg,1,err_n,err_msg)
@@ -262,6 +251,21 @@ subroutine get_nodelist(fnumb,nodelist,grouplist)
   end do
 
   read(fnumb,'(A200)') buff
+
+  ! set nodelist and grouplist
+  call set_graph_nodes(size(nodelist))
+  call set_graph_nodelist(nodelist)
+  if (flag_group) then
+    call set_graph_grouplist(grouplist)
+  end if
+
+  ! deallocation
+  deallocate(nodelist,stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+  if (flag_group) then
+    deallocate(grouplist,stat=err_n,errmsg=err_msg)
+    if (err_n /= 0) call error(my_name,err_msg)
+  end if
 
 end subroutine get_nodelist
 
