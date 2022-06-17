@@ -8,7 +8,9 @@ module mod_graph
   private
 
   ! public procedures
-  public :: set_start_vert,   &
+  public :: set_graphtype,    &
+            set_nodetype,     &
+            set_start_vert,   &
             set_end_vert,     &
             init_graph_conn,  &
             find_graph_paths
@@ -34,6 +36,8 @@ module mod_graph
     integer :: sz
   end type graph_paths_t
 
+  character(20) :: graphtype
+  character(20) :: nodetype
   type(graph_paths_t), dimension(:), allocatable :: graph_paths
   integer :: start_vert = -1
   integer :: end_vert   = -1
@@ -45,6 +49,38 @@ module mod_graph
 contains
 
 !!! Public !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine set_graphtype(str)
+
+  character(*), intent(in) :: str
+  character(*), parameter :: my_name = "set_graphtype"
+
+  select case (str)
+  case ("directed","undirected")
+    graphtype = str
+  case default
+    call error(my_name,"unknown type "//str)
+  end select
+
+end subroutine set_graphtype
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine set_nodetype(str)
+
+  character(*), intent(in) :: str
+  character(*), parameter :: my_name = "set_nodetype"
+
+  select case (str)
+  case ("individual","group")
+    nodetype = str
+  case default
+    call error(my_name,"unknown type "//str)
+  end select
+
+end subroutine set_nodetype
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine set_start_vert(a)
 
