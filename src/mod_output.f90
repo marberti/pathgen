@@ -44,8 +44,19 @@ subroutine write_input_graph()
     write(fout_numb,frmt) graph_conn(i,:)
   end do
   write(fout_numb,*)
-  write(fout_numb,*) "Start vertex: ", start_vert
-  write(fout_numb,*) "End   vertex: ", end_vert
+  if (allocated(graph_nodelist)) then
+    write(i_str,'(I8)') start_vert
+    i_str = adjustl(i_str)
+    write(fout_numb,*) "Start vertex: "//trim(graph_nodelist(start_vert))// &
+      " ("//trim(i_str)//")"
+    write(i_str,'(I8)') end_vert
+    i_str = adjustl(i_str)
+    write(fout_numb,*) "End   vertex: "//trim(graph_nodelist(end_vert))// &
+      " ("//trim(i_str)//")"
+  else
+    write(fout_numb,*) "Start vertex: ", start_vert
+    write(fout_numb,*) "End   vertex: ", end_vert
+  end if
   write(fout_numb,*)
   write(fout_numb,*) "Paths:"
 
