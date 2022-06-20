@@ -8,16 +8,32 @@ module mod_output
   private
 
   ! public procedures
-  public :: write_input_graph,      &
+  public :: set_output_file,        &
+            write_input_graph,      &
             write_graph_paths
 
   ! private variables
   integer, parameter :: fout_numb = 700
-  character(*), parameter :: fout_name = "graph.out"
+  character(120) :: fout_name
 
 contains
 
 !!! Public !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine set_output_file(fin_name)
+
+  character(*), intent(in) :: fin_name
+  character(*), parameter :: my_name = "set_output_file"
+
+  if (len_trim(fin_name) > len(fout_name) - 4) then
+    call error(my_name,"input file name too long")
+  end if
+
+  fout_name = trim(fin_name)//".out"
+
+end subroutine set_output_file
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 subroutine write_input_graph()
 

@@ -1,5 +1,5 @@
-graph.dat
-graph.out
+*.dat
+*.out
 *.o
 *.mod
 *.x
