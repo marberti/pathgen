@@ -218,6 +218,9 @@ subroutine get_nodelist(fnumb)
   character(120) :: err_msg
 
   lines = read_lines(fnumb,"endnodelist")
+  if (lines == 0) then
+    call error(my_name,"no node specified")
+  end if
 
   ! allocation section
   allocate(nodelist(lines),stat=err_n,errmsg=err_msg)
