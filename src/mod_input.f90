@@ -152,13 +152,13 @@ subroutine read_input(fname)
       if (err_n /= 0) then
         call error(my_name,"missing first argument of "//trim(keyword))
       end if
-!      call set_start_vert(arg)
+      call set_fromto_vert("from",arg)
 
       call get_field(buff,arg,3,err_n,err_msg)
       if (err_n /= 0) then
         call error(my_name,"missing second argument of "//trim(keyword))
       end if
-!      call set_end_vert(arg)
+      call set_fromto_vert("to",arg)
       flag_fromto = .true.
     case default
       call error(my_name,"invalid keyword "//trim(keyword))

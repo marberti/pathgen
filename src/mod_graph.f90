@@ -13,8 +13,7 @@ module mod_graph
             set_graph_nodes,        &
             set_graph_nodelist,     &
             set_graph_grouplist,    &
-            set_start_vert,         &
-            set_end_vert,           &
+            set_fromto_vert,        &
             init_graph_conn,        &
             find_graph_paths
 
@@ -51,7 +50,7 @@ module mod_graph
 
   character(20) :: graphtype
   character(20) :: nodetype
-  integer :: graph_nodes
+  integer :: graph_nodes = -1
   character(16), dimension(:), allocatable :: graph_nodelist
   character(16), dimension(:), allocatable :: graph_grouplist
   type(graph_paths_t), dimension(:), allocatable :: graph_paths
@@ -149,43 +148,49 @@ end subroutine set_graph_grouplist
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine set_start_vert(a)
+subroutine set_fromto_vert(mode,str)
 
-  integer, intent(in) :: a
-  character(*), parameter :: my_name = "set_start_vert"
+  character(*), intent(in) :: mode
+  character(*), intent(in) :: str
+  character(*), parameter :: my_name = "set_fromto_vert"
+  integer :: n
+  integer :: i
+  integer :: err_n
+  character(120) :: err_msg
 
-  ! preliminary checks
-  if (flag_graph_conn.eqv..false.) then
-    call error(my_name,"graph connections not initialized")
+  if (graph_nodes <= 0) then
+    call error(my_name,"graph_nodes not setted")
   end if
 
-  if ((a < 1).or.(a > size(graph_conn,1))) then
-    call error(my_name,"start vertex out of bounds")
+  if (allocated(graph_nodelist)) then
+    n = -1
+    do i=1, size(graph_nodelist)
+      if (graph_nodelist(i) == str) then
+        n = i
+        exit
+      end if
+    end do
+
+    if (n == -1) call error(my_name,"invalid node "//trim(str))
+  else
+    read(str,*,iostat=err_n,iomsg=err_msg) n
+    if (err_n /= 0) call error(my_name,"expected integer: "//trim(err_msg))
+
+    if ((n < 1).or.(n > graph_nodes)) then
+      call error(my_name,trim(str)//" out of range")
+    end if
   end if
 
-  start_vert = a
+  select case (mode)
+  case ("from")
+    start_vert = n
+  case ("to")
+    end_vert = n
+  case default
+    call error(my_name,"invalid mode "//mode)
+  end select
 
-end subroutine set_start_vert
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-subroutine set_end_vert(a)
-
-  integer, intent(in) :: a
-  character(*), parameter :: my_name = "set_end_vert"
-
-  ! preliminary checks
-  if (flag_graph_conn.eqv..false.) then
-    call error(my_name,"graph connections not initialized")
-  end if
-
-  if ((a < 1).or.(a > size(graph_conn,1))) then
-    call error(my_name,"end vertex out of bounds")
-  end if
-
-  end_vert = a
-
-end subroutine set_end_vert
+end subroutine set_fromto_vert
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
