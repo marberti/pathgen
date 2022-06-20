@@ -53,6 +53,7 @@ module mod_graph
   integer :: graph_nodes = -1
   character(16), dimension(:), allocatable :: graph_nodelist
   character(16), dimension(:), allocatable :: graph_grouplist
+  character(16), dimension(:), allocatable :: graph_unique_groups
   type(graph_paths_t), dimension(:), allocatable :: graph_paths
   integer :: start_vert = -1
   integer :: end_vert   = -1
@@ -143,6 +144,8 @@ subroutine set_graph_grouplist(list)
   if (err_n /= 0) call error(my_name,err_msg)
 
   graph_grouplist = list
+
+  call set_graph_unique_groups()
 
 end subroutine set_graph_grouplist
 
@@ -339,6 +342,57 @@ subroutine add_path(pathstr)
   end do
 
 end subroutine add_path
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine set_graph_unique_groups()
+
+  character(*), parameter :: my_name = "set_graph_unique_groups"
+  integer :: n
+  integer :: i
+  integer :: j
+  integer :: counter
+  character(16), dimension(:), allocatable :: enc_groups
+  logical :: flag_new_group
+  integer :: err_n
+  character(120) :: err_msg
+
+  n = size(graph_grouplist)
+  allocate(enc_groups(n),stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+
+  ! search unique groups
+  enc_groups(1) = graph_grouplist(1)
+  counter = 1
+  do i = 2, n
+    flag_new_group = .true.
+
+    do j = 1, counter
+      if (graph_grouplist(i) == enc_groups(j)) then
+        flag_new_group = .false.
+        exit
+      end if
+    end do
+
+    if (flag_new_group) then
+      counter = counter + 1
+      enc_groups(counter) = graph_grouplist(i)
+    end if
+  end do
+
+  ! set global variable for unique groups
+  allocate(graph_unique_groups(counter),stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+
+  do i = 1, counter
+    graph_unique_groups(i) = enc_groups(i)
+  end do
+
+  ! deallocation
+  deallocate(enc_groups,stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+
+end subroutine set_graph_unique_groups
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
