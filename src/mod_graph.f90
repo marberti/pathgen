@@ -396,4 +396,23 @@ end subroutine set_graph_unique_groups
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+integer function get_graph_unique_groups_index(g)
+
+  character(*), intent(in) :: g
+  integer :: n
+  integer :: i
+
+  n = size(graph_unique_groups)
+
+  do i = 1, n
+    if (graph_unique_groups(i) == g) then
+      get_graph_unique_groups_index = i
+      exit
+    end if
+  end do
+
+end function get_graph_unique_groups_index
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 end module mod_graph
