@@ -222,6 +222,7 @@ subroutine find_graph_paths()
 
   character(*), parameter :: my_name = "find_graph_paths"
   logical, dimension(:), allocatable :: visited
+  logical, dimension(:), allocatable :: grp_visited
   integer :: err_n
   character(120) :: err_msg
 
@@ -241,26 +242,47 @@ subroutine find_graph_paths()
   ! call the private subroutine
   paths_found = 0
   dead_paths  = 0
+
   allocate(visited(size(graph_conn,1)),stat=err_n,errmsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
   visited = .false.
-  call priv_find_graph_paths(start_vert,end_vert,visited,"")
+
+  if (allocated(graph_unique_groups)) then
+    allocate(grp_visited(size(graph_unique_groups)),stat=err_n,errmsg=err_msg)
+    if (err_n /= 0) call error(my_name,err_msg)
+    grp_visited = .false.
+  end if
+
+  call priv_find_graph_paths(start_vert,end_vert,visited,grp_visited,"")
+
+  ! deallocation
+  deallocate(visited,stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+  if (allocated(grp_visited)) then
+    deallocate(grp_visited,stat=err_n,errmsg=err_msg)
+    if (err_n /= 0) call error(my_name,err_msg)
+  end if
 
 end subroutine find_graph_paths
 
 !!! Private !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
+recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
 
   integer, intent(in) :: i
   integer, intent(in) :: f
   logical, dimension(:), intent(in) :: visited
+  logical, dimension(:), intent(in) :: grp_visited
   character(*), intent(in) :: out_str
   character(*), parameter :: my_name = "priv_find_graph_paths"
   integer :: j
+  integer :: indx1
+  integer :: indx2
   logical, dimension(:), allocatable :: nw_visited
+  logical, dimension(:), allocatable :: nw_grp_visited
   character(8) :: i_str
   character(8) :: f_str
+  logical :: flag_groups
   logical :: found_conn
   integer :: err_n
   character(120) :: err_msg
@@ -272,8 +294,25 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
   nw_visited = visited
   nw_visited(i) = .true.
 
+  if (allocated(graph_unique_groups)) then
+    flag_groups = .true.
+  else
+    flag_groups = .false.
+  end if
+  if (flag_groups) then
+    allocate(nw_grp_visited(size(graph_unique_groups)), &
+      stat=err_n,errmsg=err_msg)
+    if (err_n /= 0) call error(my_name,err_msg)
+    nw_grp_visited = grp_visited
+  end if
+
   do j = 1, size(graph_conn,1)
     if (nw_visited(j)) cycle
+
+    if (flag_groups) then
+      indx1 = get_graph_unique_groups_index(graph_grouplist(j))
+      if (nw_grp_visited(indx1)) cycle
+    end if
 
     if (graph_conn(i,j)) then
       found_conn = .true.
@@ -285,7 +324,14 @@ recursive subroutine priv_find_graph_paths(i,f,visited,out_str)
         call add_path(out_str//" "//trim(i_str)//" "//trim(f_str))
         paths_found = paths_found + 1
       else
-         call priv_find_graph_paths(j,f,nw_visited,out_str//" "//trim(i_str))
+        if (flag_groups) then
+          indx1 = get_graph_unique_groups_index(graph_grouplist(j))
+          indx2 = get_graph_unique_groups_index(graph_grouplist(i))
+          if (indx1 /= indx2) nw_grp_visited(indx2) = .true.
+        end if
+
+        call priv_find_graph_paths(j,f,nw_visited, &
+          nw_grp_visited,out_str//" "//trim(i_str))
       end if
     end if
   end do
