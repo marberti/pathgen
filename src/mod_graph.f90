@@ -287,6 +287,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
   integer :: err_n
   character(120) :: err_msg
 
+  ! set working variables
   found_conn = .false.
 
   allocate(nw_visited(size(visited)),stat=err_n,errmsg=err_msg)
@@ -306,6 +307,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
     nw_grp_visited = grp_visited
   end if
 
+  ! core
   do j = 1, size(graph_conn,1)
     if (nw_visited(j)) cycle
 
@@ -337,6 +339,14 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
   end do
 
   if (found_conn.eqv..false.) dead_paths = dead_paths + 1
+
+  ! deallocation
+  deallocate(nw_visited,stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+  if (flag_groups) then
+    deallocate(nw_grp_visited,stat=err_n,errmsg=err_msg)
+    if (err_n /= 0) call error(my_name,err_msg)
+  end if
 
 end subroutine priv_find_graph_paths
 
