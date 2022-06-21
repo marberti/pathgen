@@ -25,11 +25,14 @@ subroutine set_output_file(fin_name)
   character(*), intent(in) :: fin_name
   character(*), parameter :: my_name = "set_output_file"
 
-  if (len_trim(fin_name) > len(fout_name) - 4) then
-    call error(my_name,"input file name too long")
+  if (fin_name(len_trim(fin_name)-3:) == ".dat") then
+    fout_name = trim(fin_name(:len_trim(fin_name)-4))//".out"
+  else
+    if (len_trim(fin_name) > len(fout_name) - 4) then
+      call error(my_name,"input file name too long")
+    end if
+    fout_name = trim(fin_name)//".out"
   end if
-
-  fout_name = trim(fin_name)//".out"
 
 end subroutine set_output_file
 
