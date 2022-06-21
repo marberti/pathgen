@@ -1,6 +1,7 @@
 module mod_graph
 
   use mod_error
+  use mod_format_time
   use mod_get_field
 
   implicit none
@@ -220,9 +221,15 @@ end subroutine init_graph_conn
 
 subroutine find_graph_paths()
 
+  use, intrinsic :: iso_fortran_env
+
   character(*), parameter :: my_name = "find_graph_paths"
   logical, dimension(:), allocatable :: visited
   logical, dimension(:), allocatable :: grp_visited
+  integer(INT64) :: time_start
+  integer(INT64) :: time_end
+  integer(INT64) :: time_rate
+  integer(INT64) :: time_max
   integer :: err_n
   character(120) :: err_msg
 
@@ -253,7 +260,11 @@ subroutine find_graph_paths()
     grp_visited = .false.
   end if
 
+  call system_clock(time_start,time_rate,time_max)
   call priv_find_graph_paths(start_vert,end_vert,visited,grp_visited,"")
+  call system_clock(time_end,time_rate,time_max)
+  write(*,*) my_name//": Elapsed wall time: "// &
+    trim(format_time_s(time_end-time_start,time_rate))
 
   ! deallocation
   deallocate(visited,stat=err_n,errmsg=err_msg)
