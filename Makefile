@@ -7,6 +7,7 @@ MODDIR = mod
 
 SOURCES = mod_error.f90                   \
           mod_get_field.f90               \
+          mod_format_time.f90             \
           mod_graph.f90                   \
           mod_input.f90                   \
           mod_output.f90                  \
