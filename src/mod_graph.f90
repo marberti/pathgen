@@ -49,6 +49,7 @@ module mod_graph
     integer :: sz
   end type graph_paths_t
 
+  integer, parameter :: graph_pathstrings_len = 100000
   character(20) :: graphtype
   character(20) :: nodetype
   integer :: graph_nodes = -1
@@ -56,6 +57,8 @@ module mod_graph
   character(16), dimension(:), allocatable :: graph_grouplist
   character(16), dimension(:), allocatable :: graph_unique_groups
   type(graph_paths_t), dimension(:), allocatable :: graph_paths
+  character(400), dimension(graph_pathstrings_len) :: graph_pathstrings
+  integer :: graph_pathstrings_index = 0
   integer :: start_vert = -1
   integer :: end_vert   = -1
   integer :: paths_found
@@ -265,6 +268,7 @@ subroutine find_graph_paths()
 
   call system_clock(time_start,time_rate,time_max)
   call priv_find_graph_paths(start_vert,end_vert,visited,grp_visited,"")
+  call flush_graph_pathstrings()
   call system_clock(time_end,time_rate,time_max)
   write(*,*) my_name//": Elapsed wall time: "// &
     trim(format_time_s(time_end-time_start,time_rate))
@@ -331,7 +335,10 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
       if (j == f) then
         write(f_str,'(I8)') f
         f_str = adjustl(f_str)
-        call add_path(out_str//" "//trim(i_str)//" "//trim(f_str))
+        call add_graph_pathstrings(                   &
+          out_str//" "//trim(i_str)//" "//trim(f_str) &
+        )
+!        call add_path(out_str//" "//trim(i_str)//" "//trim(f_str))
         paths_found = paths_found + 1
       else
         if (flag_graph_grouplist) then
@@ -409,6 +416,23 @@ end subroutine add_path
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+subroutine add_graph_pathstrings(pathstr)
+
+  character(*), intent(in) :: pathstr
+
+  if (graph_pathstrings_index + 1 > graph_pathstrings_len) then
+    call flush_graph_pathstrings()
+    graph_pathstrings_index = 1
+  else
+    graph_pathstrings_index = graph_pathstrings_index + 1
+  end if
+
+  graph_pathstrings(graph_pathstrings_index) = pathstr
+
+end subroutine add_graph_pathstrings
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 subroutine set_graph_unique_groups()
 
   character(*), parameter :: my_name = "set_graph_unique_groups"
@@ -476,6 +500,31 @@ integer function get_graph_unique_groups_index(g)
   end do
 
 end function get_graph_unique_groups_index
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine flush_graph_pathstrings()
+
+  character(*), parameter :: my_name = "flush_graph_pathstrings"
+  character(*), parameter :: fname = "paths.out"
+  integer, parameter :: fnumb = 701
+  integer :: i
+  integer :: err_n
+  character(120) :: err_msg
+
+  open(unit=fnumb,file=fname,status="unknown",action="write", &
+    position="append",iostat=err_n,iomsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+
+  do i = 1, graph_pathstrings_index
+    write(fnumb,*) trim(graph_pathstrings(i))
+  end do
+  i = 1
+
+  close(unit=fnumb,iostat=err_n,iomsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+
+end subroutine flush_graph_pathstrings
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
