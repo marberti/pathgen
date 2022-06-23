@@ -21,7 +21,6 @@ program main
   call read_input(fin_name)
   call write_input_graph()
   call find_graph_paths()
-!  call write_graph_paths(.true.)
 
 contains
 

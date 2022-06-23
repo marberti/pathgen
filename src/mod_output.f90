@@ -9,8 +9,7 @@ module mod_output
 
   ! public procedures
   public :: set_output_file,        &
-            write_input_graph,      &
-            write_graph_paths
+            write_input_graph
 
   ! private variables
   integer, parameter :: fout_numb = 700
@@ -76,46 +75,11 @@ subroutine write_input_graph()
     write(fout_numb,*) "Start vertex: ", start_vert
     write(fout_numb,*) "End   vertex: ", end_vert
   end if
-  write(fout_numb,*)
-  write(fout_numb,*) "Paths:"
 
   close(unit=fout_numb,iostat=err_n,iomsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
 
 end subroutine write_input_graph
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-subroutine write_graph_paths(flag_total_paths)
-
-  logical, intent(in) :: flag_total_paths
-  character(*), parameter :: my_name = "write_graph_paths"
-  integer :: i
-  integer :: j
-  integer :: err_n
-  character(120) :: err_msg
-
-  open(unit=fout_numb,file=fout_name,status="unknown",action="write", &
-    position="append",iostat=err_n,iomsg=err_msg)
-  if (err_n /= 0) call error(my_name,err_msg)
-
-  do i = 1, size(graph_paths)
-    do j = 1, graph_paths(i)%sz
-      write(fout_numb,'(1X,I4)',advance="no") graph_paths(i)%node(j)
-    end do
-    write(fout_numb,*)
-  end do
-
-  if (flag_total_paths) then
-    write(fout_numb,*)
-    write(fout_numb,*) "Total paths found: ", paths_found
-    write(fout_numb,*) "Dead  paths found: ", dead_paths
-  end if
-
-  close(unit=fout_numb,iostat=err_n,iomsg=err_msg)
-  if (err_n /= 0) call error(my_name,err_msg)
-
-end subroutine write_graph_paths
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
