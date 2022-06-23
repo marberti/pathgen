@@ -62,6 +62,7 @@ module mod_graph
   integer :: dead_paths
   logical, dimension(:,:), allocatable :: graph_conn
   logical :: flag_graph_conn = .false.
+  logical :: flag_graph_grouplist = .false.
 
 contains
 
@@ -147,6 +148,8 @@ subroutine set_graph_grouplist(list)
   graph_grouplist = list
 
   call set_graph_unique_groups()
+
+  flag_graph_grouplist = .true.
 
 end subroutine set_graph_grouplist
 
@@ -254,7 +257,7 @@ subroutine find_graph_paths()
   if (err_n /= 0) call error(my_name,err_msg)
   visited = .false.
 
-  if (allocated(graph_unique_groups)) then
+  if (flag_graph_grouplist) then
     allocate(grp_visited(size(graph_unique_groups)),stat=err_n,errmsg=err_msg)
     if (err_n /= 0) call error(my_name,err_msg)
     grp_visited = .false.
@@ -269,7 +272,7 @@ subroutine find_graph_paths()
   ! deallocation
   deallocate(visited,stat=err_n,errmsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
-  if (allocated(grp_visited)) then
+  if (flag_graph_grouplist) then
     deallocate(grp_visited,stat=err_n,errmsg=err_msg)
     if (err_n /= 0) call error(my_name,err_msg)
   end if
@@ -293,7 +296,6 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
   logical, dimension(:), allocatable :: nw_grp_visited
   character(8) :: i_str
   character(8) :: f_str
-  logical :: flag_groups
   logical :: found_conn
   integer :: err_n
   character(120) :: err_msg
@@ -306,12 +308,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
   nw_visited = visited
   nw_visited(i) = .true.
 
-  if (allocated(graph_unique_groups)) then
-    flag_groups = .true.
-  else
-    flag_groups = .false.
-  end if
-  if (flag_groups) then
+  if (flag_graph_grouplist) then
     allocate(nw_grp_visited(size(graph_unique_groups)), &
       stat=err_n,errmsg=err_msg)
     if (err_n /= 0) call error(my_name,err_msg)
@@ -322,7 +319,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
   do j = 1, size(graph_conn,1)
     if (nw_visited(j)) cycle
 
-    if (flag_groups) then
+    if (flag_graph_grouplist) then
       indx1 = get_graph_unique_groups_index(graph_grouplist(j))
       if (nw_grp_visited(indx1)) cycle
     end if
@@ -337,7 +334,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
         call add_path(out_str//" "//trim(i_str)//" "//trim(f_str))
         paths_found = paths_found + 1
       else
-        if (flag_groups) then
+        if (flag_graph_grouplist) then
           indx1 = get_graph_unique_groups_index(graph_grouplist(j))
           indx2 = get_graph_unique_groups_index(graph_grouplist(i))
           if (indx1 /= indx2) nw_grp_visited(indx2) = .true.
@@ -354,7 +351,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
   ! deallocation
   deallocate(nw_visited,stat=err_n,errmsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
-  if (flag_groups) then
+  if (flag_graph_grouplist) then
     deallocate(nw_grp_visited,stat=err_n,errmsg=err_msg)
     if (err_n /= 0) call error(my_name,err_msg)
   end if
