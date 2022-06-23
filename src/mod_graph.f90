@@ -49,6 +49,8 @@ module mod_graph
     integer :: sz
   end type graph_paths_t
 
+  character(*), parameter :: graph_fileout_name = "graph_paths.out"
+  integer, parameter :: graph_fileout = 701
   integer, parameter :: graph_pathstrings_len = 100000
   character(20) :: graphtype
   character(20) :: nodetype
@@ -267,8 +269,10 @@ subroutine find_graph_paths()
   end if
 
   call system_clock(time_start,time_rate,time_max)
+  call open_graph_fileout()
   call priv_find_graph_paths(start_vert,end_vert,visited,grp_visited,"")
   call flush_graph_pathstrings()
+  call close_graph_fileout()
   call system_clock(time_end,time_rate,time_max)
   write(*,*) my_name//": Elapsed wall time: "// &
     trim(format_time_s(time_end-time_start,time_rate))
@@ -503,26 +507,40 @@ end function get_graph_unique_groups_index
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine flush_graph_pathstrings()
+subroutine open_graph_fileout()
 
-  character(*), parameter :: my_name = "flush_graph_pathstrings"
-  character(*), parameter :: fname = "paths.out"
-  integer, parameter :: fnumb = 701
-  integer :: i
+  character(*), parameter :: my_name = "open_graph_fileout"
   integer :: err_n
   character(120) :: err_msg
 
-  open(unit=fnumb,file=fname,status="unknown",action="write", &
-    position="append",iostat=err_n,iomsg=err_msg)
+  open(unit=graph_fileout,file=graph_fileout_name, &
+    status="replace",action="write",iostat=err_n,iomsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
+
+end subroutine open_graph_fileout
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine close_graph_fileout()
+
+  character(*), parameter :: my_name = "close_graph_fileout"
+  integer :: err_n
+  character(120) :: err_msg
+
+  close(unit=graph_fileout,iostat=err_n,iomsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+
+end subroutine close_graph_fileout
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine flush_graph_pathstrings()
+
+  integer :: i
 
   do i = 1, graph_pathstrings_index
-    write(fnumb,*) trim(graph_pathstrings(i))
+    write(graph_fileout,*) trim(graph_pathstrings(i))
   end do
-  i = 1
-
-  close(unit=fnumb,iostat=err_n,iomsg=err_msg)
-  if (err_n /= 0) call error(my_name,err_msg)
 
 end subroutine flush_graph_pathstrings
 
