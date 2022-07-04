@@ -321,7 +321,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
 
     if (flag_graph_grouplist) then
       indx1 = get_graph_unique_groups_index(graph_grouplist(j))
-      if (nw_grp_visited(indx1)) cycle
+      if (grp_visited(indx1)) cycle
     end if
 
     if (graph_conn(i,j)) then
