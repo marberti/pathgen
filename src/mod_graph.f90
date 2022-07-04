@@ -297,6 +297,7 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
   character(8) :: i_str
   character(8) :: f_str
   logical :: found_conn
+  logical :: flag_update_grp
   integer :: err_n
   character(120) :: err_msg
 
@@ -336,14 +337,22 @@ recursive subroutine priv_find_graph_paths(i,f,visited,grp_visited,out_str)
         )
         paths_found = paths_found + 1
       else
+        flag_update_grp = .false.
         if (flag_graph_grouplist) then
           indx1 = get_graph_unique_groups_index(graph_grouplist(j))
           indx2 = get_graph_unique_groups_index(graph_grouplist(i))
-          if (indx1 /= indx2) nw_grp_visited(indx2) = .true.
+          if (indx1 /= indx2) flag_update_grp = .true.
         end if
 
-        call priv_find_graph_paths(j,f,nw_visited, &
-          nw_grp_visited,out_str//" "//trim(i_str))
+        if (flag_update_grp) then
+          nw_grp_visited(indx2) = .true.
+          call priv_find_graph_paths(j,f,nw_visited, &
+            nw_grp_visited,out_str//" "//trim(i_str))
+          nw_grp_visited(indx2) = .false.
+        else
+          call priv_find_graph_paths(j,f,nw_visited, &
+            nw_grp_visited,out_str//" "//trim(i_str))
+        end if
       end if
     end if
   end do
