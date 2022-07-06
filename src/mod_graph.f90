@@ -1,5 +1,6 @@
 module mod_graph
 
+  use, intrinsic :: iso_fortran_env
   use mod_error
   use mod_format_time
   use mod_get_field
@@ -55,8 +56,8 @@ module mod_graph
   integer :: graph_pathstrings_index = 0
   integer :: start_vert = -1
   integer :: end_vert   = -1
-  integer :: paths_found
-  integer :: dead_paths
+  integer(INT64) :: paths_found
+  integer(INT64) :: dead_paths
   logical, dimension(:,:), allocatable :: graph_conn
   logical :: flag_graph_conn = .false.
   logical :: flag_graph_grouplist = .false.
