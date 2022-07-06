@@ -121,6 +121,8 @@ subroutine set_graph_nodelist(list)
 
   n = size(list)
 
+  if (n /= graph_nodes) call error(my_name,"wrong size of argument list")
+
   allocate(graph_nodelist(n),stat=err_n,errmsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
 
@@ -139,6 +141,8 @@ subroutine set_graph_grouplist(list)
   character(120) :: err_msg
 
   n = size(list)
+
+  if (n /= graph_nodes) call error(my_name,"wrong size of argument list")
 
   allocate(graph_grouplist(n),stat=err_n,errmsg=err_msg)
   if (err_n /= 0) call error(my_name,err_msg)
@@ -164,7 +168,7 @@ subroutine set_fromto_vert(mode,str)
   character(120) :: err_msg
 
   if (graph_nodes <= 0) then
-    call error(my_name,"graph_nodes not setted")
+    call error(my_name,"graph_nodes not set")
   end if
 
   if (allocated(graph_nodelist)) then
@@ -208,6 +212,10 @@ subroutine init_graph_conn(gph)
 
   if (size(gph,1) /= size(gph,2)) then
     call error(my_name,"expected square matrix as argument")
+  end if
+
+  if (size(gph,1) /= graph_nodes) then
+    call error(my_name,"wrong size of argument gph")
   end if
 
   allocate(graph_conn(size(gph,1),size(gph,1)),stat=err_n,errmsg=err_msg)
