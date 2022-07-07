@@ -4,7 +4,8 @@ module mod_get_field
   save
   private
 
-  public :: get_field
+  public :: get_field,   &
+            count_fields
 
 contains
 
@@ -92,6 +93,30 @@ subroutine get_field(str_in,str_out,n,err_n,err_msg)
   err_n   = SUCCESS
 
 end subroutine get_field
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+integer function count_fields(str)
+
+  character(*), intent(in) :: str
+  character(120) :: ch
+  integer :: i
+  integer :: err_n
+  character(120) :: err_msg
+
+  i = 0
+  do
+    i = i + 1
+    call get_field(str,ch,i,err_n,err_msg)
+    if (err_n /= 0) then
+      i = i - 1
+      exit
+    end if
+  end do
+
+  count_fields = i
+
+end function count_fields
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
