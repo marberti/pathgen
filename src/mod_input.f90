@@ -42,6 +42,9 @@ subroutine read_input(fname)
   ! endedgelist
   !
   ! fromto n1 n2            | search all paths from node n1 to n2.
+  !
+  ! search_from_groups      | (optional) if this keyword is encountered,
+  !                         | then the search of paths will start from groups
 
   character(*), intent(in) :: fname
   character(*), parameter :: my_name = "read_input"
@@ -57,6 +60,7 @@ subroutine read_input(fname)
   logical :: flag_nodelist
   logical :: flag_edgelist
   logical :: flag_fromto
+  logical :: flag_sfg
   integer :: err_n
   character(120) :: err_msg
 
@@ -67,6 +71,7 @@ subroutine read_input(fname)
   flag_nodelist   = .false.
   flag_edgelist   = .false.
   flag_fromto     = .false.
+  flag_sfg        = .false.
 
   ! open input file
   open(unit=fnumb,file=fname,status="old",action="read",&
@@ -160,6 +165,9 @@ subroutine read_input(fname)
       end if
       call set_fromto_vert("to",arg)
       flag_fromto = .true.
+    ! select case - optional keywords
+    case ("search_from_groups")
+      flag_sfg = .true.
     case default
       call error(my_name,"invalid keyword "//trim(keyword))
     end select
@@ -191,6 +199,9 @@ subroutine read_input(fname)
       " was not specified in input file"
     flag_error = .true.
   end if
+
+  ! optional keywords
+  if (flag_sfg) call set_search_from_groups()
 
   ! close input file
   close(unit=fnumb,iostat=err_n,iomsg=err_msg)

@@ -16,6 +16,7 @@ module mod_graph
             set_graph_nodelist,     &
             set_graph_grouplist,    &
             set_fromto_vert,        &
+            set_search_from_groups, &
             init_graph_conn,        &
             find_graph_paths
 
@@ -56,11 +57,15 @@ module mod_graph
   integer :: graph_pathstrings_index = 0
   integer :: start_vert = -1
   integer :: end_vert   = -1
+  integer :: start_vert_grp = -1
+  integer :: end_vert_grp   = -1
   integer(INT64) :: paths_found
   integer(INT64) :: dead_paths
   logical, dimension(:,:), allocatable :: graph_conn
+  logical, dimension(:,:), allocatable :: graph_conn_grp
   logical :: flag_graph_conn = .false.
   logical :: flag_graph_grouplist = .false.
+  logical :: flag_search_from_groups = .false.
 
 contains
 
@@ -154,6 +159,59 @@ subroutine set_graph_grouplist(list)
   flag_graph_grouplist = .true.
 
 end subroutine set_graph_grouplist
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine set_search_from_groups()
+
+  character(*), parameter :: my_name = "set_search_from_groups"
+  integer :: n
+  integer :: i
+  integer :: j
+  integer :: indx1
+  integer :: indx2
+  integer :: err_n
+  character(120) :: err_msg
+
+  ! checks
+  if ((start_vert == -1).or.(end_vert == -1)) then
+    call error(my_name,"start or end vertices not set")
+  end if
+
+  if (.not.flag_graph_conn) call error(my_name,"graph connections not init")
+
+  if (.not.flag_graph_grouplist) call error(my_name,"groups required")
+
+  ! set
+  start_vert_grp = get_graph_unique_groups_index(graph_grouplist(start_vert))
+  end_vert_grp   = get_graph_unique_groups_index(graph_grouplist(end_vert))
+  if (start_vert_grp == end_vert_grp) then
+    call error(my_name,"search from groups requires that "// &
+      "start and end vertices belong to different groups")
+  end if
+
+  n = size(graph_unique_groups)
+  allocate(graph_conn_grp(n,n),stat=err_n,errmsg=err_msg)
+  if (err_n /= 0) call error(my_name,err_msg)
+  graph_conn_grp = .false.
+
+  do i = 1, graph_nodes
+    do j = 1, graph_nodes
+      if (graph_conn(i,j)) then
+        indx1 = get_graph_unique_groups_index(graph_grouplist(i))
+        indx2 = get_graph_unique_groups_index(graph_grouplist(j))
+        graph_conn_grp(indx1,indx2) = .true.
+      end if
+    end do
+  end do
+
+  do i = 1, n
+    graph_conn_grp(i,i) = .false.
+  end do
+
+  flag_search_from_groups = .true.
+
+end subroutine set_search_from_groups
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -272,7 +330,12 @@ subroutine find_graph_paths()
   call system_clock(time_start,time_rate,time_max)
   call open_graph_fileout()
   if (flag_graph_grouplist) then
-    call priv_find_graph_paths_grp(start_vert,end_vert,visited,grp_visited,"")
+    if (flag_search_from_groups) then
+      !TODO fill
+    else
+      call priv_find_graph_paths_grp(start_vert,end_vert,visited, &
+        grp_visited,"")
+    end if
   else
     call priv_find_graph_paths_std(start_vert,end_vert,visited,"")
   end if
